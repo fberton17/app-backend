@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const Producto = require('../models/Producto');
+const Producto = require('../models/product');
+const { verificarToken, permitirRol } = require('../middleware/auth');
 
-// Obtener todos los productos disponibles
+// Ver productos públicos
 router.get('/', async (req, res) => {
   const productos = await Producto.find({ disponible: true });
   res.json(productos);
 });
 
-// Agregar producto (admin)
-router.post('/', async (req, res) => {
+// Crear producto (solo admin)
+router.post('/', verificarToken, permitirRol('admin'), async (req, res) => {
   try {
     const nuevo = new Producto(req.body);
     await nuevo.save();
@@ -19,8 +20,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Actualizar producto
-router.put('/:id', async (req, res) => {
+// Editar producto (solo admin)
+router.put('/:id', verificarToken, permitirRol('admin'), async (req, res) => {
   try {
     const actualizado = await Producto.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(actualizado);
@@ -29,8 +30,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// Eliminar producto
-router.delete('/:id', async (req, res) => {
+// Eliminar producto (solo admin)
+router.delete('/:id', verificarToken, permitirRol('admin'), async (req, res) => {
   try {
     await Producto.findByIdAndDelete(req.params.id);
     res.json({ mensaje: 'Producto eliminado' });

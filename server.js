@@ -14,11 +14,11 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.error('Error MongoDB:', err));
 
 // Rutas
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/productos', require('./routes/productos'));
-app.use('/api/pedidos', require('./routes/pedidos'));
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/chat', require('./routes/chat'));
+app.use('/api/auth', require('./api/auth'));
+app.use('/api/productos', require('./api/productos'));
+app.use('/api/pedidos', require('./api/pedidos'));
+app.use('/api/admin', require('./api/admin'));
+app.use('/api/chat', require('./api/chat'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

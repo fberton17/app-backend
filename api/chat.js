@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ChatLog = require('../models/chatlog');
+const ChatLog = require('../models/ChatLog');
 
 // Simula respuesta IA
 function generarRespuestaIA(mensaje) {
