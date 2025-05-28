@@ -8,6 +8,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Logging middleware
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.url}`);
+  if (Object.keys(req.body).length > 0) {
+    console.log('Request Body:', req.body);
+  }
+  next();
+});
+
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Conectado a MongoDB'))
