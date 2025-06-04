@@ -102,7 +102,7 @@ router.post('/', verificarToken, permitirRol('admin'), async (req, res) => {
     await nuevo.save();
     res.status(201).json(nuevo);
   } catch (err) {
-    res.status(400).json({ mensaje: 'Error al crear el producto' });
+    res.status(400).json({ mensaje: 'Error al crear el producto', error: err.message });
   }
 });
 
