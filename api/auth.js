@@ -3,10 +3,81 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/user');
+const { verificarToken, permitirRol } = require('../middleware/auth');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Registro
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Usuario:
+ *       type: object
+ *       required:
+ *         - nombre
+ *         - email
+ *         - password
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: ID auto-generado del usuario
+ *         nombre:
+ *           type: string
+ *           description: Nombre del usuario
+ *         email:
+ *           type: string
+ *           description: Correo electrónico del usuario
+ *           format: email
+ *         password:
+ *           type: string
+ *           description: Contraseña del usuario (encriptada)
+ *         rol:
+ *           type: string
+ *           description: Rol del usuario en el sistema
+ *           enum: [estudiante, admin]
+ *           default: estudiante
+ */
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Registrar un nuevo usuario
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nombre
+ *               - email
+ *               - password
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *                 description: Nombre del usuario
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Correo electrónico del usuario
+ *               password:
+ *                 type: string
+ *                 description: Contraseña del usuario
+ *               rol:
+ *                 type: string
+ *                 enum: [estudiante, admin]
+ *                 default: estudiante
+ *                 description: Rol del usuario
+ *     responses:
+ *       201:
+ *         description: Usuario registrado exitosamente
+ *       400:
+ *         description: Ya existe un usuario con ese correo electrónico
+ *       500:
+ *         description: Error del servidor
+ */
 router.post('/register', async (req, res) => {
   try {
     const { nombre, email, password, rol } = req.body;
@@ -23,7 +94,59 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Iniciar sesión en la aplicación
+ *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Correo electrónico del usuario
+ *               password:
+ *                 type: string
+ *                 description: Contraseña del usuario
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT para autenticación
+ *                 usuario:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       description: ID del usuario
+ *                     nombre:
+ *                       type: string
+ *                       description: Nombre del usuario
+ *                     rol:
+ *                       type: string
+ *                       description: Rol del usuario
+ *       401:
+ *         description: Contraseña incorrecta
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error del servidor
+ */
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -40,4 +163,39 @@ router.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/auth/usuario:
+ *   get:
+ *     summary: Obtener información del usuario autenticado
+ *     tags: [Autenticación]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Información del usuario obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Usuario'
+ *       401:
+ *         description: No autorizado - No se proporcionó un token válido
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error del servidor
+ */
+router.get('/usuario', verificarToken, async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuario.id).select('-password');
+    if (!usuario) return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+
+    res.json(usuario);
+  } catch (err) {
+    console.error('Error en endpoint GET /usuario:', err);
+    res.status(500).json({ mensaje: 'Error en el servidor' });
+  }
+});
+
 module.exports = router;
+
