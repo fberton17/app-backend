@@ -1,3 +1,5 @@
+./node_modules
+./node_modules/.bin
 /node_modules/.bin/acorn
 /node_modules/.bin/bcrypt
 /node_modules/.bin/browserslist
@@ -1498,10 +1500,6 @@
 /node_modules/@jsdevtools/ono/README.md
 /node_modules/@mongodb-js/saslprep/dist/.esm-wrapper.mjs
 /node_modules/@mongodb-js/saslprep/dist/browser.d.ts
-/node_modules/@mongodb-js/saslprep/dist/browser.d.ts.map
-/node_modules/@mongodb-js/saslprep/dist/browser.js
-/node_modules/@mongodb-js/saslprep/dist/browser.js.map
-/node_modules/@mongodb-js/saslprep/dist/code-points-data.d.ts
 /node_modules/@mongodb-js/saslprep/dist/code-points-data.d.ts.map
 /node_modules/@mongodb-js/saslprep/dist/code-points-data.js
 /node_modules/@mongodb-js/saslprep/dist/code-points-data.js.map
@@ -2998,10 +2996,6 @@
 /node_modules/caniuse-lite/data/features/high-resolution-time.js
 /node_modules/caniuse-lite/data/features/history.js
 /node_modules/caniuse-lite/data/features/html5semantic.js
-/node_modules/caniuse-lite/data/features/html-media-capture.js
-/node_modules/caniuse-lite/data/features/http2.js
-/node_modules/caniuse-lite/data/features/http3.js
-/node_modules/caniuse-lite/data/features/http-live-streaming.js
 /node_modules/caniuse-lite/data/features/iframe-sandbox.js
 /node_modules/caniuse-lite/data/features/iframe-seamless.js
 /node_modules/caniuse-lite/data/features/iframe-srcdoc.js
@@ -3498,10 +3492,6 @@
 /node_modules/caniuse-lite/data/regions/TG.js
 /node_modules/caniuse-lite/data/regions/TH.js
 /node_modules/caniuse-lite/data/regions/TJ.js
-/node_modules/caniuse-lite/data/regions/TL.js
-/node_modules/caniuse-lite/data/regions/TM.js
-/node_modules/caniuse-lite/data/regions/TN.js
-/node_modules/caniuse-lite/data/regions/TO.js
 /node_modules/caniuse-lite/data/regions/TR.js
 /node_modules/caniuse-lite/data/regions/TT.js
 /node_modules/caniuse-lite/data/regions/TV.js
@@ -3998,10 +3988,6 @@
 /node_modules/eslint/conf/replacements.json
 /node_modules/eslint/conf/rule-type-list.json
 /node_modules/eslint/lib/cli-engine/formatters/checkstyle.js
-/node_modules/eslint/lib/cli-engine/formatters/compact.js
-/node_modules/eslint/lib/cli-engine/formatters/formatters-meta.json
-/node_modules/eslint/lib/cli-engine/formatters/html.js
-/node_modules/eslint/lib/cli-engine/formatters/jslint-xml.js
 /node_modules/eslint/lib/cli-engine/formatters/json.js
 /node_modules/eslint/lib/cli-engine/formatters/json-with-metadata.js
 /node_modules/eslint/lib/cli-engine/formatters/junit.js
@@ -4498,10 +4484,6 @@
 /node_modules/etag/README.md
 /node_modules/execa/lib/command.js
 /node_modules/execa/lib/error.js
-/node_modules/execa/lib/kill.js
-/node_modules/execa/lib/promise.js
-/node_modules/execa/lib/stdio.js
-/node_modules/execa/lib/stream.js
 /node_modules/execa/index.d.ts
 /node_modules/execa/index.js
 /node_modules/execa/license
@@ -5498,10 +5480,6 @@
 /node_modules/jest-watcher/build/index.d.ts
 /node_modules/jest-watcher/build/index.js
 /node_modules/jest-watcher/build/JestHooks.js
-/node_modules/jest-watcher/build/PatternPrompt.js
-/node_modules/jest-watcher/build/TestWatcher.js
-/node_modules/jest-watcher/build/types.js
-/node_modules/jest-watcher/LICENSE
 /node_modules/jest-watcher/package.json
 /node_modules/jest-worker/build/base/BaseWorkerPool.js
 /node_modules/jest-worker/build/workers/ChildProcessWorker.js
@@ -6998,10 +6976,6 @@
 /node_modules/mongodb/lib/cmap/auth/mongodb_oidc/human_callback_workflow.js.map
 /node_modules/mongodb/lib/cmap/auth/mongodb_oidc/k8s_machine_workflow.js
 /node_modules/mongodb/lib/cmap/auth/mongodb_oidc/k8s_machine_workflow.js.map
-/node_modules/mongodb/lib/cmap/auth/mongodb_oidc/machine_workflow.js
-/node_modules/mongodb/lib/cmap/auth/mongodb_oidc/machine_workflow.js.map
-/node_modules/mongodb/lib/cmap/auth/mongodb_oidc/token_cache.js
-/node_modules/mongodb/lib/cmap/auth/mongodb_oidc/token_cache.js.map
 /node_modules/mongodb/lib/cmap/auth/mongodb_oidc/token_machine_workflow.js
 /node_modules/mongodb/lib/cmap/auth/mongodb_oidc/token_machine_workflow.js.map
 /node_modules/mongodb/lib/cmap/auth/auth_provider.js
@@ -8498,10 +8472,6 @@
 /node_modules/safe-stable-stringify/LICENSE
 /node_modules/safe-stable-stringify/package.json
 /node_modules/safe-stable-stringify/readme.md
-/node_modules/safer-buffer/dangerous.js
-/node_modules/safer-buffer/LICENSE
-/node_modules/safer-buffer/package.json
-/node_modules/safer-buffer/Porting-Buffer.md
 /node_modules/safer-buffer/Readme.md
 /node_modules/safer-buffer/safer.js
 /node_modules/safer-buffer/tests.js

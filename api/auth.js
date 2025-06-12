@@ -197,5 +197,33 @@ router.get('/usuario', verificarToken, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Cerrar sesión del usuario
+ *     tags: [Autenticación]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada exitosamente
+ *       401:
+ *         description: No autorizado - No se proporcionó un token válido
+ *       500:
+ *         description: Error del servidor
+ */
+router.post('/logout', verificarToken, async (req, res) => {
+  try {
+    console.log('Logout request received for user:', req.usuario.id);
+    // In a stateless JWT system, logout is handled client-side by removing the token
+    // The server can't invalidate the token, but we can log the logout event
+    res.json({ mensaje: 'Sesión cerrada exitosamente' });
+  } catch (err) {
+    console.error('Error en logout:', err);
+    res.status(500).json({ mensaje: 'Error en el servidor' });
+  }
+});
+
 module.exports = router;
 
