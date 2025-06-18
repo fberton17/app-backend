@@ -722,3 +722,35 @@ router.get('/:id', verificarToken, async (req, res) => {
 });
 
 module.exports = router;
+
+/**
+ * @swagger
+ * /api/pedidos:
+ *   get:
+ *     summary: Obtener todos los pedidos (solo administradores)
+ *     tags: [Pedidos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista completa de pedidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Pedido'
+ *       401:
+ *         description: No autorizado - No se proporcionó un token válido
+ *       403:
+ *         description: Prohibido - No es un administrador
+ */
+router.get('/', verificarToken, permitirRol('admin'), async (req, res) => {
+  try {
+    const pedidos = await Pedido.find().populate('productos.producto').populate('usuario', 'nombre email');
+    res.json(pedidos);
+  } catch (err) {
+    res.status(500).json({ mensaje: 'Error al obtener los pedidos' });
+  }
+});
+

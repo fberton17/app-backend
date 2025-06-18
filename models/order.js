@@ -26,6 +26,7 @@ const pedidoSchema = new mongoose.Schema({
     enum: ['pendiente', 'confirmado', 'preparando', 'listo', 'entregado', 'cancelado'],
     default: 'pendiente'
   },
+
   total: { type: Number, required: true },
   metodoPago: { type: String, enum: ['efectivo', 'tarjeta', 'mercadopago'], required: true },
   fecha: { type: Date, default: Date.now },
@@ -36,5 +37,6 @@ const pedidoSchema = new mongoose.Schema({
     comentario: String
   }
 });
+
 
 module.exports = mongoose.model('Pedido', pedidoSchema);
