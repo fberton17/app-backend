@@ -48,6 +48,8 @@ app.use('/api/productos', require('./api/productos'));
 app.use('/api/pedidos', require('./api/pedidos'));
 app.use('/api/admin', require('./api/admin'));
 app.use('/api/chat', require('./api/chat'));
+app.use('/api/menuDelDia', require('./api/menuDelDia'));
 
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
