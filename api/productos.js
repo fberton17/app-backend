@@ -184,4 +184,45 @@ router.delete('/:id', verificarToken, permitirRol('admin'), async (req, res) => 
   }
 });
 
+
+/**
+ * @swagger
+ * /api/productos/menu-del-dia:
+ *   get:
+ *     summary: Obtener los productos con categoría "menu" creados hoy
+ *     tags: [Productos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de menús del día disponibles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Producto'
+ *       500:
+ *         description: Error al obtener los menús del día
+ */
+router.get('/menu-del-dia', verificarToken, async (req, res) => {
+  try {
+    const inicioDelDia = new Date();
+    inicioDelDia.setHours(0, 0, 0, 0);
+    const finDelDia = new Date();
+    finDelDia.setHours(23, 59, 59, 999);
+
+    const menus = await Producto.find({
+      categoria: 'menu',
+      creadoEn: { $gte: inicioDelDia, $lte: finDelDia },
+      disponible: true
+    });
+
+    res.status(200).json(menus); // 👉 ahora devuelve directamente un array como el GET principal
+  } catch (error) {
+    console.error('Error al obtener menús del día:', error);
+    res.status(500).json({ error: 'Error al obtener el menú del día' });
+  }
+});
+
 module.exports = router;

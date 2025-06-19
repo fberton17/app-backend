@@ -7,7 +7,7 @@ const productoSchema = new mongoose.Schema({
   imagen: { type: String }, // URL de la imagen
   disponible: { type: Boolean, default: true },
   stock: { type: Number, default: 0 },
-  categoria: { type: String, enum: ['bebida', 'comida', 'snack'], required: true },
+  categoria: { type: String, enum: ['bebida', 'comida', 'snack', 'menu'], required: true },
   creadoEn: { type: Date, default: Date.now }
 });
 
