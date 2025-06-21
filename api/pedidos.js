@@ -721,7 +721,7 @@ router.get('/:id', verificarToken, async (req, res) => {
   }
 });
 
-module.exports = router;
+
 
 /**
  * @swagger
@@ -754,3 +754,4 @@ router.get('/', verificarToken, permitirRol('admin'), async (req, res) => {
   }
 });
 
+module.exports = router;

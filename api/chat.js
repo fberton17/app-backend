@@ -23,47 +23,67 @@ function formatearPreferencias(preferencias) {
 }
 
 /**
- * Construye el prompt dinámico con productos actuales
+ * Genera una respuesta desde OpenAI (GPT-3.5)
  */
-async function generarPromptConProductos(mensajeUsuario, usuarioId) {
+async function generarRespuestaIA(mensajeUsuario, usuarioId) {
+  // 1. Obtener los últimos 5 mensajes del usuario
+  const historial = await ChatLog.find({ usuario: usuarioId })
+    .sort({ fecha: -1 }) // del más reciente al más antiguo
+    .limit(5)
+    .lean();
+
+  // 2. Invertir para que estén en orden cronológico
+  const historialOrdenado = historial.reverse();
+
+  // 3. Convertir a formato de OpenAI
+  const mensajesContexto = historialOrdenado.flatMap(entry => ([
+    { role: 'user', content: entry.mensajeUsuario },
+    { role: 'assistant', content: entry.respuestaIA }
+  ]));
+
+  // 4. Obtener productos y preferencias para el sistema
   const productos = await Producto.find({ disponible: true });
   const usuario = await Usuario.findById(usuarioId);
   const textoPreferencias = formatearPreferencias(usuario?.preferencias);
 
-  if (productos.length === 0) {
-    return `No hay productos disponibles. El usuario dijo: "${mensajeUsuario}". Preferencias: ${textoPreferencias}. Respondé con empatía.`;
-  }
-
   const lista = productos.map(p => `- ${p.nombre} ($${p.precio})`).join('\n');
 
-  return `
-Sos un asistente amigable que recomienda productos de una cantina universitaria.
+  const mensajeSistema = `
+    Sos un asistente amigable que recomienda productos de una cantina universitaria. 
 
-Preferencias del usuario:
-${textoPreferencias}
+    Tenés que ayudar al usuario a elegir productos que estén disponibles actualmente en el menú, dando prioridad a sus preferencias personales.
 
-Estos son los productos disponibles:
-${lista}
+    Siempre que sea posible:
+    - Recomendá productos que coincidan con sus sabores preferidos, su dieta, y sus alergias.
+    - Evitá sugerir productos que no respeten sus restricciones.
+    - Si no hay coincidencias exactas, explicá por qué y sugerí lo más cercano posible.
 
-El usuario escribió: "${mensajeUsuario}"
+    Respondé con empatía, de forma breve y clara.
 
-Recomendale algo que pueda gustarle. Sé breve, claro y simpático.
-`.trim();
-}
+    Estas son las preferencias del usuario:
+    ${textoPreferencias}
 
-/**
- * Genera una respuesta desde OpenAI (GPT-3.5)
- */
-async function generarRespuestaIA(mensajeUsuario, usuarioId) {
-  const prompt = await generarPromptConProductos(mensajeUsuario, usuarioId);
+    Estos son los productos disponibles:
+    ${lista}
+    `.trim();
 
+
+  // 5. Mensaje nuevo del usuario
+  const mensajeActual = { role: 'user', content: mensajeUsuario };
+
+  // 6. Enviar a OpenAI con todo el contexto
   const completion = await openai.chat.completions.create({
-    messages: [{ role: 'user', content: prompt }],
     model: 'gpt-3.5-turbo',
+    messages: [
+      { role: 'system', content: mensajeSistema },
+      ...mensajesContexto,
+      mensajeActual
+    ],
   });
 
   return completion.choices[0].message.content;
 }
+
 
 /**
  * POST /api/chat — Enviar mensaje al chatbot y guardar respuesta
