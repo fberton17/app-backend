@@ -8,7 +8,11 @@ const productoSchema = new mongoose.Schema({
   disponible: { type: Boolean, default: true },
   stock: { type: Number, default: 0 },
   categoria: { type: String, enum: ['bebida', 'comida', 'snack', 'menu'], required: true },
-  creadoEn: { type: Date, default: Date.now }
+  creadoEn: { type: Date, default: Date.now },
+  sabores: [String],
+  dieta: [String],
+  alergias: [String],
+
 });
 
 module.exports = mongoose.model('Producto', productoSchema);
