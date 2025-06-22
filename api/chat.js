@@ -60,6 +60,9 @@ async function generarRespuestaIA(mensajeUsuario, usuarioId) {
 
     Respondé con empatía, de forma breve y clara.
 
+    Intenta razonar que lo que estés recomendando realmente esté alineado con las preferencias del usuario,
+    atende a que por ejemplo una milanesa no es dulce.
+
     Estas son las preferencias del usuario:
     ${textoPreferencias}
 
