@@ -34,6 +34,24 @@ app.use((req, res, next) => {
   if (req.body && Object.keys(req.body).length > 0) {
     console.log('Request Body:', req.body);
   }
+  
+  // Capture response data
+  const originalSend = res.send;
+  res.send = function(data) {
+    console.log(`Response Status: ${res.statusCode}`);
+    if (data) {
+      try {
+        // Try to parse as JSON for better formatting
+        const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+        console.log('Response Body:', parsedData);
+      } catch (e) {
+        // If it's not JSON, log as string
+        console.log('Response Body:', data);
+      }
+    }
+    originalSend.call(this, data);
+  };
+  
   next();
 });
 
@@ -49,7 +67,7 @@ app.use('/api/pedidos', require('./api/pedidos'));
 app.use('/api/admin', require('./api/admin'));
 app.use('/api/chat', require('./api/chat'));
 app.use('/api/menuDelDia', require('./api/menuDelDia'));
-
+app.use('/api/store', require('./api/store'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));

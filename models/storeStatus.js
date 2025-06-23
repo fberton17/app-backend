@@ -12,8 +12,7 @@ const storeStatusSchema = new mongoose.Schema({
   },
   updatedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   notes: {
     type: String,

@@ -70,6 +70,38 @@ router.get('/', async (req, res) => {
 
 /**
  * @swagger
+ * /api/productos/todos:
+ *   get:
+ *     summary: Obtener todos los productos (disponibles y no disponibles)
+ *     tags: [Productos]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de todos los productos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Producto'
+ *       401:
+ *         description: No autorizado - No se proporcionó un token válido
+ */
+router.get('/todos', verificarToken, permitirRol('admin'), async (req, res) => {
+  try {
+    const productos = await Producto.find();
+    res.json(productos);
+  } catch (err) {
+    res.status(500).json({ 
+      mensaje: 'Error al obtener los productos', 
+      error: err.message 
+    });
+  }
+});
+
+/**
+ * @swagger
  * /api/productos:
  *   post:
  *     summary: Crear un nuevo producto (solo administradores)
@@ -181,6 +213,88 @@ router.delete('/:id', verificarToken, permitirRol('admin'), async (req, res) => 
     res.json({ mensaje: 'Producto eliminado' });
   } catch {
     res.status(400).json({ mensaje: 'Error al eliminar' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/productos/{id}/disponibilidad:
+ *   patch:
+ *     summary: Actualizar el estado de disponibilidad de un producto (solo administradores)
+ *     tags: [Productos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del producto
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - disponible
+ *             properties:
+ *               disponible:
+ *                 type: boolean
+ *                 description: Estado de disponibilidad del producto
+ *     responses:
+ *       200:
+ *         description: El estado de disponibilidad fue actualizado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Producto'
+ *       400:
+ *         description: Error al actualizar el estado de disponibilidad
+ *       401:
+ *         description: No autorizado - No se proporcionó un token válido
+ *       403:
+ *         description: Prohibido - No es un administrador
+ *       404:
+ *         description: Producto no encontrado
+ */
+router.put('/:id/disponibilidad', verificarToken, permitirRol('admin'), async (req, res) => {
+  try {
+    const { disponible } = req.body;
+    
+    if (typeof disponible !== 'boolean') {
+      return res.status(400).json({ 
+        mensaje: 'El campo "disponible" debe ser un valor booleano (true/false)' 
+      });
+    }
+
+    const producto = await Producto.findByIdAndUpdate(
+      req.params.id, 
+      { disponible }, 
+      { new: true, runValidators: true }
+    );
+
+    if (!producto) {
+      return res.status(404).json({ 
+        mensaje: 'Producto no encontrado',
+        error: 'El producto con el ID proporcionado no existe'
+      });
+    }
+
+    // Asegurar que la respuesta sea JSON con código 200
+    return res.status(200).json({
+      success: true,
+      mensaje: 'Estado de disponibilidad actualizado correctamente',
+      producto: producto
+    });
+
+  } catch (err) {
+    return res.status(400).json({ 
+      success: false,
+      mensaje: 'Error al actualizar el estado de disponibilidad', 
+      error: err.message 
+    });
   }
 });
 
