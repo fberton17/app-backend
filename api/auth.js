@@ -247,6 +247,77 @@ router.put('/usuario/preferencias', verificarToken, async (req, res) => {
 
 /**
  * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Obtener las preferencias del usuario autenticado
+ *     tags: [Autenticación]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Preferencias del usuario obtenidas correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     preferencias:
+ *                       type: object
+ *                       properties:
+ *                         sabores:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                         dieta:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                         alergias:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                         bebidas:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *       401:
+ *         description: No autorizado - token inválido o ausente
+ *       500:
+ *         description: Error en el servidor
+ */
+router.get('/me', verificarToken, async (req, res) => {
+  try {
+    console.log(`📥 GET /auth/me para el usuario: ${req.usuario.id}`);
+    const usuario = await Usuario.findById(req.usuario.id).lean();
+
+    if (!usuario) return res.status(404).json({ success: false, mensaje: 'Usuario no encontrado' });
+
+    res.json({
+      success: true,
+      data: {
+        preferencias: usuario.preferencias || {
+          sabores: [],
+          dieta: [],
+          alergias: [],
+          bebidas: []
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Error al obtener perfil:', err);
+    res.status(500).json({ success: false, mensaje: 'Error en el servidor' });
+  }
+});
+
+
+/**
+ * @swagger
  * /api/auth/logout:
  *   post:
  *     summary: Cerrar sesión del usuario
