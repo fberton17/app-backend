@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Pedido = require('../models/order');
 const { verificarToken, permitirRol } = require('../middleware/auth');
+const { verificarTiendaAbierta } = require('../middleware/storeStatus');
 
 /**
  * @swagger
@@ -185,8 +186,25 @@ router.get('/debug-productos', async (req, res) => {
  *         description: Error al crear el pedido
  *       401:
  *         description: No autorizado - No se proporcionó un token válido
+ *       403:
+ *         description: Tienda cerrada - No se pueden recibir nuevos pedidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 mensaje:
+ *                   type: string
+ *                   description: Mensaje explicando que la tienda está cerrada
+ *                 tiendaAbierta:
+ *                   type: boolean
+ *                   description: Estado de la tienda (siempre false en este caso)
+ *                 ultimaActualizacion:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Fecha de la última actualización del estado de la tienda
  */
-router.post('/', verificarToken, permitirRol('estudiante', 'admin'), async (req, res) => {
+router.post('/', verificarToken, permitirRol('estudiante', 'admin'), verificarTiendaAbierta, async (req, res) => {
   try {
     const { productos, total, metodoPago } = req.body;
 
@@ -462,6 +480,102 @@ router.put('/:id/estado', verificarToken, permitirRol('admin'), async (req, res)
     console.error('Error al actualizar estado del pedido:', err);
     res.status(400).json({ 
       mensaje: 'Error al actualizar el estado del pedido',
+      error: err.message 
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/pedidos/{id}/cancelar:
+ *   put:
+ *     summary: Cancelar un pedido (solo administradores)
+ *     tags: [Pedidos]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del pedido
+ *     responses:
+ *       200:
+ *         description: Pedido cancelado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Pedido'
+ *       400:
+ *         description: Error al cancelar el pedido
+ *       401:
+ *         description: No autorizado - No se proporcionó un token válido
+ *       403:
+ *         description: Prohibido - No es un administrador
+ *       404:
+ *         description: Pedido no encontrado
+ */
+router.put('/:id/cancelar', verificarToken, permitirRol('admin'), async (req, res) => {
+  try {
+    const pedido = await Pedido.findById(req.params.id);
+
+    if (!pedido) {
+      return res.status(404).json({ mensaje: 'Pedido no encontrado' });
+    }
+
+    // Verificar que el pedido no esté ya cancelado
+    if (pedido.estado === 'cancelado') {
+      return res.status(400).json({ mensaje: 'El pedido ya está cancelado' });
+    }
+
+    // Verificar que el pedido no esté entregado
+    if (pedido.estado === 'entregado') {
+      return res.status(400).json({ mensaje: 'No se puede cancelar un pedido que ya fue entregado' });
+    }
+
+    // Actualizar el estado a cancelado
+    const pedidoCancelado = await Pedido.findByIdAndUpdate(
+      req.params.id, 
+      { estado: 'cancelado' }, 
+      { new: true }
+    );
+
+    // Formatear la respuesta usando la información ya almacenada
+    const respuestaFormateada = {
+      _id: pedidoCancelado._id,
+      usuario: {
+        _id: pedidoCancelado.usuario,
+        nombre: pedidoCancelado.clienteNombre,
+        email: pedidoCancelado.clienteEmail
+      },
+      productos: pedidoCancelado.productos.map(item => ({
+        producto: {
+          _id: item.productoId,
+          nombre: item.productoNombre,
+          descripcion: item.productoDescripcion,
+          precio: item.productoPrecio,
+          imagen: item.productoImagen,
+          categoria: item.productoCategoria
+        },
+        cantidad: item.cantidad,
+        subtotal: item.subtotal
+      })),
+      estado: pedidoCancelado.estado,
+      total: pedidoCancelado.total,
+      metodoPago: pedidoCancelado.metodoPago,
+      fecha: pedidoCancelado.fecha,
+      calificacion: pedidoCancelado.calificacion
+    };
+
+    res.json({
+      mensaje: 'Pedido cancelado exitosamente',
+      pedido: respuestaFormateada
+    });
+  } catch (err) {
+    console.error('Error al cancelar pedido:', err);
+    res.status(400).json({ 
+      mensaje: 'Error al cancelar el pedido',
       error: err.message 
     });
   }
